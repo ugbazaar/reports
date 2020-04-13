@@ -19,7 +19,7 @@ class _HomePageState extends State<HomePage> {
   Widget build(BuildContext context) {
     return Scaffold(
       appBar: AppBar(
-        title: Text("Http Test App"),
+        title: Text("Year to Year Comparison"),
       ),
       body: SafeArea(
         child: FutureBuilder(
@@ -39,16 +39,16 @@ class _HomePageState extends State<HomePage> {
                               Orientation.portrait
                           ? 1
                           : 2,
-                      childAspectRatio: 1.8),
+                      childAspectRatio: 1.7),
                   children: <Widget>[
                     customTemplate(
                         "Year-to-Year Today", snapshot.data.appDataModel[0]),
-                    customTemplate(
-                        "Year-to-Year 7 Days", snapshot.data.appDataModel[1]),
-                    customTemplate(
-                        "Year-to-Year 30 Days", snapshot.data.appDataModel[2]),
-                    customTemplate(
-                        "Year-to-Year 90 Days", snapshot.data.appDataModel[3]),
+                    customTemplate("Year-to-Year 7 Days (Excl. Today)",
+                        snapshot.data.appDataModel[1]),
+                    customTemplate("Year-to-Year 30 Days (Excl. Today)",
+                        snapshot.data.appDataModel[2]),
+                    customTemplate("Year-to-Year 90 Days (Excl. Today)",
+                        snapshot.data.appDataModel[3]),
                   ],
                 ),
               ),
@@ -60,11 +60,28 @@ class _HomePageState extends State<HomePage> {
   }
 
   Widget customTemplate(String title, DataModel dataModel) {
+    Color backgroundColor = Color(0x99ffaa00);
+    if (dataModel.difference.createdCount.sign == '+' &&
+        dataModel.difference.createdAmount.sign == '+' &&
+        dataModel.difference.deliveredCount.sign == '+' &&
+        dataModel.difference.deliveredAmount.sign == '+') {
+      backgroundColor = Color(0xaa00ff00);
+    } else if (dataModel.difference.createdAmount.sign == '+' &&
+        dataModel.difference.deliveredAmount.sign == '+') {
+      backgroundColor = Color(0x3300ff00);
+    } else if (dataModel.difference.createdAmount.sign == '-' &&
+        dataModel.difference.deliveredAmount.sign == '-') {
+      backgroundColor = Color(0xaaff0000);
+    } else if (dataModel.difference.createdAmount.sign == '-' ||
+        dataModel.difference.deliveredAmount.sign == '-') {
+      backgroundColor = Color(0x44ff0000);
+    }
     return Padding(
       padding: const EdgeInsets.all(8.0),
       child: Container(
-        height: 100,
+        // height: 100,
         child: Card(
+          color: backgroundColor, // This color should be dyanamic
           elevation: 5.0,
           child: Padding(
             padding: const EdgeInsets.all(8.0),
@@ -74,12 +91,14 @@ class _HomePageState extends State<HomePage> {
                   padding: const EdgeInsets.all(8.0),
                   child: Text(
                     title,
-                    style:
-                        TextStyle(fontSize: 22.0, fontWeight: FontWeight.w700),
+                    style: TextStyle(
+                      fontSize: 18.0,
+                      fontWeight: FontWeight.w700,
+                    ),
                   ),
                 ),
                 Divider(),
-                SizedBox(height: 15),
+                SizedBox(height: 2),
                 Row(
                   mainAxisAlignment: MainAxisAlignment.spaceBetween,
                   children: <Widget>[
@@ -89,13 +108,32 @@ class _HomePageState extends State<HomePage> {
                         Text(
                           "Last Year",
                           style: TextStyle(
-                              fontSize: 16.0, fontWeight: FontWeight.w700),
+                            fontSize: 16.0,
+                            fontWeight: FontWeight.w700,
+                            decoration: TextDecoration.underline,
+                          ),
                         ),
                         Divider(),
-                        Text("${dataModel.lastYear.createdCount} new orders"),
-                        Text("Rs. ${dataModel.lastYear.createdAmount}"),
-                        Text("${dataModel.lastYear.deliveredCount} deliveries"),
-                        Text("Rs. ${dataModel.lastYear.deliveredAmount}"),
+                        Text("${dataModel.lastYear.createdCount} new orders:"),
+                        Text(
+                          "Rs. ${dataModel.lastYear.createdAmount}",
+                          style: TextStyle(
+                            fontSize: 16,
+                            fontWeight: FontWeight.w500,
+                            fontStyle: FontStyle.italic,
+                          ),
+                        ),
+                        SizedBox(height: 15),
+                        Text(
+                            "${dataModel.lastYear.deliveredCount} deliveries:"),
+                        Text(
+                          "Rs. ${dataModel.lastYear.deliveredAmount}",
+                          style: TextStyle(
+                            fontSize: 16,
+                            fontWeight: FontWeight.w500,
+                            fontStyle: FontStyle.italic,
+                          ),
+                        ),
                       ],
                     ),
                     Column(
@@ -104,13 +142,31 @@ class _HomePageState extends State<HomePage> {
                         Text(
                           "This Year",
                           style: TextStyle(
-                              fontSize: 16.0, fontWeight: FontWeight.w700),
+                            fontSize: 16.0,
+                            fontWeight: FontWeight.w700,
+                            decoration: TextDecoration.underline,
+                          ),
                         ),
                         Divider(),
-                        Text("${dataModel.thisYear.createdCount} new orders"),
-                        Text("Rs. ${dataModel.thisYear.createdAmount}"),
-                        Text("${dataModel.thisYear.deliveredCount} deliveries"),
-                        Text("Rs. ${dataModel.thisYear.deliveredAmount}"),
+                        Text("${dataModel.thisYear.createdCount} new orders:"),
+                        Text(
+                          "Rs. ${dataModel.thisYear.createdAmount}",
+                          style: TextStyle(
+                            fontSize: 16,
+                            fontWeight: FontWeight.w500,
+                            fontStyle: FontStyle.italic,
+                          ),
+                        ),
+                        SizedBox(height: 15),
+                        Text(
+                            "${dataModel.thisYear.deliveredCount} deliveries:"),
+                        Text(
+                          "Rs. ${dataModel.thisYear.deliveredAmount}",
+                          style: TextStyle(
+                              fontSize: 16,
+                              fontWeight: FontWeight.w500,
+                              fontStyle: FontStyle.italic),
+                        ),
                       ],
                     ),
                     Column(
@@ -119,17 +175,21 @@ class _HomePageState extends State<HomePage> {
                         Text(
                           "Change",
                           style: TextStyle(
-                              fontSize: 16.0, fontWeight: FontWeight.w700),
+                            fontSize: 16.0,
+                            fontWeight: FontWeight.w700,
+                            decoration: TextDecoration.underline,
+                          ),
                         ),
                         Divider(),
                         Text(
                             "${dataModel.difference.createdCount.sign}${dataModel.difference.createdCount.percent}%"),
                         Text(
-                            "${dataModel.difference.createdCount.sign}${dataModel.difference.createdAmount.percent}%"),
+                            "${dataModel.difference.createdAmount.sign}${dataModel.difference.createdAmount.percent}%"),
+                        SizedBox(height: 15),
                         Text(
-                            "${dataModel.difference.createdCount.sign}${dataModel.difference.deliveredCount.percent}%"),
+                            "${dataModel.difference.deliveredCount.sign}${dataModel.difference.deliveredCount.percent}%"),
                         Text(
-                            "${dataModel.difference.createdCount.sign}${dataModel.difference.deliveredAmount.percent}%"),
+                            "${dataModel.difference.deliveredAmount.sign}${dataModel.difference.deliveredAmount.percent}%"),
                       ],
                     ),
                   ],
